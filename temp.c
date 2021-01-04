@@ -97,7 +97,7 @@ int main (void) {
         lcdPosition(lcdfd, 0, 1);
         if (count / 6  % 4 == 0)
         {
-            lcdPrintf(lcdfd, "1. Home Brew ");
+            lcdPrintf(lcdfd, "1. h20 c02  ");
         }
         else if (count / 6 % 4 == 1)
         {
@@ -105,13 +105,13 @@ int main (void) {
         }
         else if (count / 6 %4 == 2)
         {
-            lcdPrintf(lcdfd, "3. Hazy Ltl Thg ");
+            lcdPrintf(lcdfd, "3. LF  Stein");
         }
         else
         {
-            lcdPrintf(lcdfd, "4. Dragon's Milk");
+            lcdPrintf(lcdfd, "4.              ");
         }
-        if (tempF[0] > 52)
+        if (tempF[0] > 42)
         {
             fan1 = 100;
             fan2 = 100;
@@ -119,7 +119,7 @@ int main (void) {
             digitalWrite(11, 1);
         }
 
-        if (tempF[0] < 51)
+        if (tempF[0] < 40)
         {
             fan1 = 0;
             fan2 = 0;
