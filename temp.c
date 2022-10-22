@@ -18,6 +18,33 @@ static int callback(void * pNotUsed, int ArgCount, char ** pArgs, char **azColNa
   return 0;
 }
 
+char Beers[8][16] = {
+//"2. Surly-Axe Man");
+     "HB Lager     ",
+     "             ",
+     "HB Kolsch    ",
+     "HB Irish Red ",
+     "HB Mshake IPA",
+     "HB Pumpkin   ",
+     "HN Red IPA   "
+};
+
+
+void PrintScreen(int lcdfd, int beer, int freezer, float t1, float t2, float t3)
+{
+    lcdPosition (lcdfd, 0, 0);
+    if (freezer)
+    {
+        lcdPrintf(lcdfd, "*%.1f %.1f %.1f ", t1, t2, t3);
+    }
+    else
+    {
+        lcdPrintf(lcdfd, " %.1f %.1f %.1f ", t1, t2, t3);
+    }
+    lcdPosition(lcdfd, 0, 1);
+    lcdPrintf(lcdfd, "%d. %s", beer + 1, Beers[beer]);
+}
+
 int main (void) {
     DIR * dir;
     struct dirent * dirent;
@@ -37,6 +64,7 @@ int main (void) {
     int rc;
     int fan1;
     int fan2;
+    int freezer = 0;
     int count = 0;
     wiringPiSetup();
     lcdfd = lcdInit(2, 16, 4,
@@ -45,6 +73,7 @@ int main (void) {
     lcdClear(lcdfd);
     pinMode (10, OUTPUT);
     pinMode (11, OUTPUT);
+    pinMode (0, OUTPUT);
     dir = opendir (path);
     rc = sqlite3_open("/home/pi/src/keezerpi/templog.db", &db);
     if( rc ){
@@ -92,24 +121,61 @@ int main (void) {
         else
             sleep(1);
         devno++;
+        PrintScreen(lcdfd, (count / 6) % 7, freezer, tempF[0], tempF[1], tempF[2]);
+/*
         lcdPosition (lcdfd, 0, 0) ;
-        lcdPrintf(lcdfd, " %.1f %.1f %.1f ", tempF[0], tempF[1], tempF[2]);
-        lcdPosition(lcdfd, 0, 1);
-        if (count / 6  % 4 == 0)
+        if (freezer)
         {
-            lcdPrintf(lcdfd, "1. h20 c02  ");
-        }
-        else if (count / 6 % 4 == 1)
-        {
-            lcdPrintf(lcdfd, "2.              ");
-        }
-        else if (count / 6 %4 == 2)
-        {
-            lcdPrintf(lcdfd, "3. LF  Stein");
+            lcdPrintf(lcdfd, "*%.1f %.1f %.1f ", tempF[0], tempF[1], tempF[2]);
         }
         else
         {
-            lcdPrintf(lcdfd, "4.              ");
+            lcdPrintf(lcdfd, " %.1f %.1f %.1f ", tempF[0], tempF[1], tempF[2]);
+
+        }
+        lcdPosition(lcdfd, 0, 1);
+        if (count / 6  % 4 == 0)
+        {
+        lcdPosition (lcdfd, 0, 0);
+        if (freezer)
+        {
+            lcdPrintf(lcdfd, "*%.1f %.1f %.1f ", tempF[0], tempF[1], tempF[2]);
+        }
+        else
+        {
+            lcdPrintf(lcdfd, " %.1f %.1f %.1f ", tempF[0], tempF[1], tempF[2]);
+
+        }
+       	    lcdPosition(lcdfd, 0, 1);
+            lcdPrintf(lcdfd, "1. LF Stein     ");
+        }
+        else if (count / 6 % 4 == 1)
+        {
+		lcdPosition (lcdfd, 0, 0);
+        	if (freezer)
+        	{
+	            lcdPrintf(lcdfd, "*%.1f %.1f %.1f ", tempF[0], tempF[1], tempF[2]);
+        	}
+	        else
+	        {
+        	    lcdPrintf(lcdfd, " %.1f %.1f %.1f ", tempF[0], tempF[1], tempF[2]);
+	        }
+        	lcdPosition(lcdfd, 0, 1);
+            	lcdPrintf(lcdfd, "2. Surly-Axe Man");
+        }
+        else if (count / 6 %4 == 2)
+        {
+	    lcdPosition (lcdfd, 0, 0);
+	    lcdPrintf(lcdfd, " Happy Birthday ");
+	    lcdPosition(lcdfd, 0, 1);
+	    lcdPrintf(lcdfd, "    Chris!!!    ");
+        }
+        else
+        {
+            lcdPosition (lcdfd, 0, 0);
+            lcdPrintf(lcdfd, " Happy Birthday ");
+            lcdPosition(lcdfd, 0, 1);
+            lcdPrintf(lcdfd, "    Chris!!!    ");
         }
         if (tempF[0] > 42)
         {
@@ -117,6 +183,18 @@ int main (void) {
             fan2 = 100;
             digitalWrite(10, 1);
             digitalWrite(11, 1);
+        }
+*/
+
+	if (tempF[1] > 40)
+        {
+	    freezer = 1;
+            digitalWrite(0, 1);
+        }
+        else if (tempF[1] < 38)
+        {
+            freezer = 0;
+            digitalWrite(0, 0);
         }
 
         if (tempF[0] < 40)
@@ -148,4 +226,5 @@ int main (void) {
     }
 /* return 0; --never called due to loop */
 }
+
 
